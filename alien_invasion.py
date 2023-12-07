@@ -1,9 +1,11 @@
 import sys
 
+from time import sleep
 import pygame
+import snoop
 
 from settings import Settings
-
+from game_stats import GameStats
 from ship import Ship
 
 from bullet import Bullet
@@ -21,7 +23,9 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
-        pygame.display.set_caption("Alien Invasion")
+        pygame.display.set_caption("Yoshi Invasion")
+        # Create an instanceto store game statistics.
+        self.stats = GameStats(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
@@ -71,6 +75,7 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self.fire_bullet()
 
+    @snoop
     def check_keyup_event(self, event):
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
@@ -146,6 +151,22 @@ class AlienInvasion:
         """Check if the fleet is at an edge, ten update the position of all aliens in the fleet"""
         self._check_fleet_edges()
         self.aliens.update()
+        # look for alien-ship collisions.
+        if pygame.sprite.spritecollideany(self.ship,self.aliens):
+            self._ship_hit()
+
+    def _ship_hit(self):
+        """Respond to the ship being hit by alien."""
+        # Decrement ships_left.
+        self.stats.ships_left -= 1
+
+        # Get rid of any remaining aliens and bullets.
+        self.aliens.empty()
+        self.ship.center_ship()
+
+        # Pause.
+        sleep(0.5)
+
 
 
 if __name__ == '__main__':
