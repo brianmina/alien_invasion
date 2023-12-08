@@ -6,6 +6,7 @@ import snoop
 
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from ship import Ship
 
 from bullet import Bullet
@@ -30,6 +31,8 @@ class AlienInvasion:
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
+        # Make a play button.
+        self.play_button = Button(self,"Play")
         # Set background color.
         # self.bg_color = (230, 230, 230)
 
