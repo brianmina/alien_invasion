@@ -163,7 +163,6 @@ class AlienInvasion:
         # Get rid of any remaining aliens and bullets.
         self.aliens.empty()
         self.ship.center_ship()
-
         # Pause.
         sleep(0.5)
 
