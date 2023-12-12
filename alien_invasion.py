@@ -25,26 +25,30 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Yoshi Invasion")
+
         # Create an instanceto store game statistics.
         self.stats = GameStats(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
-        # Make a play button.
-        self.play_button = Button(self,"Play")
+
+        # Start game in an inactive state
+        self.game_active = False
+
+        # Make the play button
+        self.play_button = Button(self, "Play")
         # Set background color.
         # self.bg_color = (230, 230, 230)
 
-    @snoop(depth=3)
     def run_game(self):
         """star the main loop for the game"""
         while True:
             self._check_events()
-            if self.stats.game_active:
+            if self.game_active:
                 self.ship.update()
                 self._update_bullets()
-                self._update_aliens()
+                self._update_alien()
             self._update_screen()
 
     def _check_events(self):
@@ -66,7 +70,10 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
-        # make the most recently drawn screen visible.
+        # Draw the play button if the game is inactive
+        if not self.game_active:
+            self.play_button.draw_button()
+            # make the most recently drawn screen visible.
         pygame.display.flip()
 
     def check_keydown_event(self, event):
@@ -80,6 +87,7 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self.fire_bullet()
 
+    @snoop
     def check_keyup_event(self, event):
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
@@ -151,7 +159,7 @@ class AlienInvasion:
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
 
-    def _update_aliens(self):
+    def _update_alien(self):
         """Check if the fleet is at an edge, ten update the position of all aliens in the fleet"""
         self._check_fleet_edges()
         self.aliens.update()
@@ -163,11 +171,13 @@ class AlienInvasion:
 
     def _ship_hit(self):
         """Respond to the ship being hit by alien."""
+        # Decrement ships_left.
         if self.stats.ships_left > 0:
-            # Decrement ships_left.
             self.stats.ships_left -= 1
             # Get rid of any remaining aliens and bullets.
             self.aliens.empty()
+            self.bullets.empty()
+            self._create_fleet()
             self.ship.center_ship()
             # Pause.
             sleep(0.5)
@@ -175,14 +185,13 @@ class AlienInvasion:
             self.stats.game_active = False
 
     def _check_aliens_bottom(self):
-        """Check if any aliens have reache the bottom of the screen."""
+        """Check if any aliens have reached the bottom of the screen."""
         screen_rect = self.screen.get_rect()
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= screen_rect.bottom:
                 # Treat this the same as if the ship got hit.
                 self._ship_hit()
                 break
-
 
 
 
