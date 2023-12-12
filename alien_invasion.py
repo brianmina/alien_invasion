@@ -36,6 +36,7 @@ class AlienInvasion:
         # Set background color.
         # self.bg_color = (230, 230, 230)
 
+    @snoop(depth=3)
     def run_game(self):
         """star the main loop for the game"""
         while True:
@@ -44,7 +45,7 @@ class AlienInvasion:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
-                self._update_screen()
+            self._update_screen()
 
     def _check_events(self):
         """Respond to key presses and mouse event."""
@@ -79,7 +80,6 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self.fire_bullet()
 
-    @snoop
     def check_keyup_event(self, event):
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
