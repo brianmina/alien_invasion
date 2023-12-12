@@ -6,6 +6,7 @@ import snoop
 
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from ship import Ship
 
 from bullet import Bullet
@@ -24,12 +25,19 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Yoshi Invasion")
+
         # Create an instanceto store game statistics.
         self.stats = GameStats(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
+
+        # Start game in an inactive state
+        self.game_active = False
+
+        # Make the play button
+        self.play_button = Button(self, "Play")
         # Set background color.
         # self.bg_color = (230, 230, 230)
 
@@ -37,9 +45,10 @@ class AlienInvasion:
         """star the main loop for the game"""
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_alien()
+            if self.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_alien()
             self._update_screen()
 
     def _check_events(self):
@@ -61,7 +70,10 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
-        # make the most recently drawn screen visible.
+        # Draw the play button if the game is inactive
+        if not self.game_active:
+            self.play_button.draw_button()
+            # make the most recently drawn screen visible.
         pygame.display.flip()
 
     def check_keydown_event(self, event):
@@ -160,12 +172,17 @@ class AlienInvasion:
     def _ship_hit(self):
         """Respond to the ship being hit by alien."""
         # Decrement ships_left.
-        self.stats.ships_left -= 1
-        # Get rid of any remaining aliens and bullets.
-        self.aliens.empty()
-        self.ship.center_ship()
-        # Pause.
-        sleep(0.5)
+        if self.stats.ships_left > 0:
+            self.stats.ships_left -= 1
+            # Get rid of any remaining aliens and bullets.
+            self.aliens.empty()
+            self.bullets.empty()
+            self._create_fleet()
+            self.ship.center_ship()
+            # Pause.
+            sleep(0.5)
+        else:
+            self.stats.game_active = False
 
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
