@@ -72,9 +72,12 @@ class AlienInvasion:
         if button_clicked and not self.game_active:
             # Reset the game settings.
             self.settings.initialize_dynamic_settings()
+
             # Reset the game statistics.
             self.stats.reset_stats()
             self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
             self.game_active = True
             pygame.mouse.set_visible(False)
 
@@ -106,7 +109,6 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self.fire_bullet()
 
-    @snoop
     def check_keyup_event(self, event):
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
@@ -140,9 +142,13 @@ class AlienInvasion:
             self.sb.prep_score()
             self.sb.check_high_score()
         if not self.aliens:
-            # Destroy exisitng bullets and create a new fleet.
+            # Destroy existing bullets and create a new fleet.
             self._create_fleet()
             self.settings.increase_speed()
+
+            # Increase the level.
+            self.stats.level += 1
+            self.sb.prep_level()
 
     def _create_fleet(self):
         """Create the fleet of aliens."""
@@ -198,7 +204,9 @@ class AlienInvasion:
         """Respond to the ship being hit by alien."""
         # Decrement ships_left.
         if self.stats.ships_left > 0:
+            # Decrement ships_left, and update scoreboard.
             self.stats.ships_left -= 1
+            self.sb.prep_ships()
             # Get rid of any remaining aliens and bullets.
             self.aliens.empty()
             self.bullets.empty()
