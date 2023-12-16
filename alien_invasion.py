@@ -1,9 +1,11 @@
+import os
 import sys
 
 from time import sleep
 import pygame
 import snoop
 
+sys.path.append("..")
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
@@ -15,6 +17,7 @@ from bullet import Bullet
 from alien import Alien
 
 
+
 class AlienInvasion:
     """Overall class to manage game assets and behavior"""
 
@@ -22,7 +25,7 @@ class AlienInvasion:
         """initialize the game , and create game resources"""
         pygame.init()
         self.settings = Settings()
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((1200, 800)) #pygame.FULLSCREEN
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Yoshi Invasion")
@@ -160,8 +163,8 @@ class AlienInvasion:
 
         # Determine the number of rows of aliens that fit on the screen.
         ship_height = self.ship.rect.height
-        available_space_y = (self.settings.screen_height - (alien_height) - ship_height)
-        number_rows = available_space_y // (2 * alien_height)
+        available_space_y = (self.settings.screen_height - alien_height - ship_height)
+        number_rows = available_space_y // (4 * alien_height)
 
         # Create the full fleet of aliens.
         for row_number in range(number_rows):
@@ -228,8 +231,15 @@ class AlienInvasion:
                 break
 
 
+def main():
+    ai = AlienInvasion()
+    ai.run_game()
+
 
 if __name__ == '__main__':
     # Make game instance, and run the game.
-    ai = AlienInvasion()
-    ai.run_game()
+    main()
+
+    # to create exe, run this in virtual env
+    # -> pyinstaller C:\Users\kmarx-levi\repos\alien_invasion.spec
+    # exe is in \dist

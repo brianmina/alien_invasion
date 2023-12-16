@@ -1,3 +1,5 @@
+from os import path
+
 import pygame
 from pygame.sprite import Sprite
 
@@ -11,8 +13,9 @@ class Ship(Sprite):
         self.settings = ai_game.settings
         self.screen_rect = ai_game.screen.get_rect()
         # load the ship image ang its rect.
-        self.image = pygame.image.load("images/ship_mario.bmp")
+        self.image = pygame.image.load(path.abspath(path.join(path.dirname(__file__), "ship_mario.bmp")))
         self.rect = self.image.get_rect()
+
         # start each new ship at the bottom center of the screen
         self.rect.midbottom = self.screen_rect.midbottom
         # store a decimal value for the ship's horizontal position.

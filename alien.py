@@ -1,3 +1,5 @@
+from os import path
+
 import pygame
 from pygame.sprite import Sprite
 
@@ -10,7 +12,7 @@ class Alien(Sprite):
         self.screen = ai_game.screen
         self.settings = ai_game.settings
         # Load the alien image and set its rect attribute.
-        self.image = pygame.image.load("images/new_yoshi.bmp")
+        self.image = pygame.image.load(path.abspath(path.join(path.dirname(__file__), "new_yoshi.bmp")))
         self.rect = self.image.get_rect()
         # Star a new alien near the top left of the screen.
         self.rect.x = self.rect.width
